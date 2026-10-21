@@ -6,10 +6,12 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import { config } from './config.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { createAuthRouter } from './routes/auth.js';
 
 const clientDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist');
 
-export function createApp() {
+// Tests pass a higher login-attempt limit so that signing up many test users doesn't trip the rate limiter.
+export function createApp({ authAttemptsPerWindow = 20 } = {}) {
   const app = express();
 
   app.use(helmet());
@@ -20,6 +22,8 @@ export function createApp() {
     const databaseUp = mongoose.connection.readyState === 1;
     res.status(databaseUp ? 200 : 503).json({ status: databaseUp ? 'ok' : 'database unavailable' });
   });
+
+  app.use('/api/auth', createAuthRouter({ attemptsPerWindow: authAttemptsPerWindow }));
 
   // Unknown API paths get a JSON 404 instead of falling through to the React app.
   app.use('/api', (req, res) => {
