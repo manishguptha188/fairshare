@@ -16,6 +16,12 @@ const clientDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.
 export function createApp({ authAttemptsPerWindow = 20 } = {}) {
   const app = express();
 
+  // Hosts like Render put a proxy in front of the app. Trusting one proxy hop makes req.ip the visitor's
+  // address; without it every visitor would look like the proxy and share a single login rate limit.
+  if (config.isProduction) {
+    app.set('trust proxy', 1);
+  }
+
   app.use(helmet());
   app.use(express.json({ limit: '20kb' }));
   app.use(cookieParser());

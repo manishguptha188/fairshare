@@ -212,3 +212,85 @@ money changing hands ("Meera paid Asha ₹600 by UPI").
 
 **Try it.** Write a unit test in `money.test.js` for four friends where two people are owed and two owe, and work out
 by hand what `suggestSettlements` should return before running it.
+
+---
+
+## 6. The React app
+
+**Concept.** The React app is a *single-page app*: the browser loads it once, and React Router swaps pages without
+reloading. Each page asks the API for data with `fetch` and shows one of four things: **loading**, an **error** (with
+"Try again"), an **empty** state, or the data. After a change (a new expense) it fetches again so the screen matches
+the database.
+
+**Files.**
+- `client/src/main.jsx`: starts React with `<BrowserRouter>`.
+- `client/src/App.jsx`: the routes. Pages that need a login sit inside `<RequireAuth>`.
+- `client/src/api.js`: `apiRequest()` calls `/api/...` and turns every failure into an `ApiError`
+  (`status`, `message`, `fields`).
+- `client/src/hooks/useApi.js`: loads one API path and returns `{ data, error, isLoading, reload }`.
+- `client/src/auth/AuthContext.jsx`: who is logged in, shared with every component through React context.
+- `client/src/pages/GroupPage.jsx`: loads the group, its expenses, balances and payments, and passes them to the
+  panels in `client/src/components/group/`.
+- `client/src/lib/money.js`: `toPaise("250.50") → 25050` and `formatRupees(25050) → "₹250.50"`.
+
+**How "add an expense" travels through the UI.**
+1. `ExpenseForm` keeps the typed values in state. On submit, `validate()` checks them in the browser (instant
+   feedback) and builds the payload with amounts in paise.
+2. It calls `onSubmit(payload)`, which `GroupPage` provides: `apiRequest('/groups/:id/expenses', { method: 'POST' })`.
+3. If the server says no (`ApiError` with `fields`), the form shows the messages and keeps what was typed.
+4. If it works, `GroupPage` calls `reload()` on expenses, balances and payments, and `useApi` fetches them again.
+
+**Decisions and alternatives.**
+- *Validation happens twice on purpose.* The browser check is for speed; the server check is for safety, because
+  anyone can call the API without this form.
+- *`useApi` instead of a data library.* Libraries such as TanStack Query add caching, retries and background refresh.
+  Here a 30-line hook is enough and shows exactly what such a library does: track the request, ignore out-of-date
+  responses (`AbortController`), and reload on demand. "Loading" is *derived* (the latest result belongs to an
+  older request) rather than stored, which avoids an extra render.
+- *The form gets `onSubmit` as a prop* rather than calling the API itself, so it can be tested with a fake function
+  and reused for both "add" and "edit". Changing its `key` resets it when you start editing a different expense.
+- *Amounts are parsed as text.* `19.99 * 100` is `1998.9999999999998` in JavaScript, so `toPaise` splits the rupees
+  and the paise with a regular expression instead.
+- *Dates are calendar days* stored at midnight UTC and shown in UTC, so 22 October never turns into 21 October for
+  someone in another time zone.
+- *Plain CSS with variables* instead of a CSS framework: fewer things to learn at once, and the layout switches to two
+  columns on wide screens with one `@media` rule.
+
+**Check yourself.**
+1. What would go wrong if `useApi` didn't abort the previous request when you click "Older" twice quickly?
+2. Where does the app decide whether to show "Mark as paid", and why does the server check again anyway?
+3. Why does `RequireAuth` show "Checking your session…" before deciding where to send you?
+
+**Try it.** Add a "Record a different amount" form under the suggested payments in `BalancesPanel.jsx`, so someone
+can record a partial payment. Reuse `TextField` and `toPaise`, and add a test like the ones in
+`BalancesPanel.test.jsx`.
+
+---
+
+## 7. Testing and deployment
+
+**Concept.** Tests are small programs that use your code and check the result, so you can change things without
+fear. Deployment means running the app on a server that anyone can reach.
+
+**Files.**
+- `server/tests/*.test.js`: API tests (Supertest sends real HTTP requests to `createApp()`).
+- `server/tests/globalSetup.js` and `setup.js`: start one MongoDB for the run; give each test file its own database.
+- `client/src/**/*.test.jsx`: component and app tests (React Testing Library).
+- `.github/workflows/ci.yml`: runs lint, tests and the build on GitHub for every push.
+- `render.yaml`: how Render should build and start the app.
+
+**Decisions and alternatives.**
+- *Test behaviour, not internals.* Tests click buttons and read text by its label the way a person would, so
+  renaming a variable doesn't break them, but breaking a feature does.
+- *Pure functions get unit tests* (`money.test.js`); *routes get API tests*. Most bugs in this app would be in the
+  money rules or in "who may do what", and both are covered.
+- *One server for API and app in production* avoids CORS and keeps the cookie same-site. The alternative (React on
+  Vercel, API on Render) needs CORS and `SameSite=None` cookies.
+
+**Check yourself.**
+1. Why does each server test file get its own database name?
+2. Which test would fail if `loadGroup` stopped checking membership?
+3. What has to be set on Render before the app can start, and why isn't it in the repository?
+
+**Try it.** Break something on purpose (for example, remove the `sharesTotal !== input.amount` check), run
+`npm test`, and read which test fails and why. Then put it back.

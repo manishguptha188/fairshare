@@ -1,0 +1,23 @@
+# Render Blueprint: one free web service that runs the Express API and serves the built React app.
+# The database is a free MongoDB Atlas cluster; paste its connection string into MONGODB_URI on Render.
+services:
+  - type: web
+    name: fairshare
+    runtime: node
+    plan: free
+    # Dev dependencies (Vite) are needed to build the client, even though NODE_ENV is production.
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      # The test database download isn't needed on the server.
+      - key: MONGOMS_DISABLE_POSTINSTALL
+        value: "1"
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
