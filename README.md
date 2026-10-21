@@ -1,5 +1,7 @@
 # FairShare
 
+[![CI](https://github.com/manishguptha188/fairshare/actions/workflows/ci.yml/badge.svg)](https://github.com/manishguptha188/fairshare/actions/workflows/ci.yml)
+
 Split shared expenses with flatmates and friends, then settle up with as few payments as possible.
 
 Sharing a flat or a trip means a stream of small payments: one person pays the rent, another the groceries, someone
