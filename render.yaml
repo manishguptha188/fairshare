@@ -5,6 +5,8 @@ services:
     name: fairshare
     runtime: node
     plan: free
+    # The closest Render region to India. It can't be changed after the service is created.
+    region: singapore
     # Dev dependencies (Vite) are needed to build the client, even though NODE_ENV is production.
     buildCommand: npm ci --include=dev && npm run build
     startCommand: npm start

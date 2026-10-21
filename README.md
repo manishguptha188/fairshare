@@ -110,8 +110,7 @@ the testing approach.
 
 The repository includes a [Render](https://render.com) Blueprint (`render.yaml`) for one free web service that serves
 both the API and the React app, with a free [MongoDB Atlas](https://www.mongodb.com/atlas) cluster as the database.
-It is **not deployed yet**. To deploy: create the Atlas cluster, create the service from the Blueprint, and set
-`MONGODB_URI` to the Atlas connection string (Render generates `JWT_SECRET`).
+It is **not deployed yet**. Step-by-step instructions are in [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Limits and next steps
 
