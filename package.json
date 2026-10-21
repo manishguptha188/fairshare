@@ -1,0 +1,29 @@
+{
+  "name": "fairshare",
+  "private": true,
+  "type": "module",
+  "description": "Split shared expenses with flatmates and friends, then settle up with the fewest payments.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "db": "npm run db --workspace server",
+    "dev": "concurrently --names server,client --prefix-colors blue,magenta \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "seed": "npm run seed --workspace server",
+    "test": "npm test --workspace server && npm test --workspace client",
+    "lint": "eslint .",
+    "build": "npm run build --workspace client",
+    "start": "npm start --workspace server"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "concurrently": "^10.0.6",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0"
+  }
+}

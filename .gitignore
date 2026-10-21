@@ -1,0 +1,15 @@
+node_modules/
+client/dist/
+coverage/
+
+# Local secrets and the local development database
+.env
+server/.data/
+
+# Editors, local tool settings and OS files
+.claude/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
