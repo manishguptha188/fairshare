@@ -101,6 +101,8 @@ Status codes used: 200, 201, 204, 400 (validation), 401 (not logged in), 403 (lo
 - Every request body is validated with Zod; Mongoose schemas repeat the critical rules (integer paise, required
   fields) as a second line of defence. Request bodies are capped at 20 kB.
 - `helmet` sets standard security headers, including a Content Security Policy.
+- Secrets come only from environment variables, and the server never prints `MONGODB_URI` (a hosted connection
+  string contains the database password).
 
 ## Testing
 
