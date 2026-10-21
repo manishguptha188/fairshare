@@ -31,6 +31,7 @@ describe('POST /api/auth/register', () => {
       .send({ name: 'Other', email: 'ASHA@example.com', password: 'another-pass-2' });
 
     expect(res.status).toBe(409);
+    expect(res.body.fields.email).toBeDefined();
     expect(await User.countDocuments()).toBe(1);
   });
 

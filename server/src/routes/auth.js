@@ -45,7 +45,9 @@ export function createAuthRouter({ attemptsPerWindow }) {
       // The unique index on email is the real guard: checking "does it exist?" first could race with
       // a second sign-up for the same email arriving at the same moment.
       if (err.code === 11000) {
-        throw new HttpError(409, 'An account with this email already exists.');
+        throw new HttpError(409, 'An account with this email already exists.', {
+          email: 'Already registered. Try logging in instead.',
+        });
       }
       throw err;
     }
