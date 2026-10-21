@@ -45,17 +45,17 @@ Go to **Database & Network Access** → **IP Access List** → **Add IP Address*
 
 ### 4. Copy the connection string
 1. Go to **Clusters** → click **Connect** on your cluster → **Drivers** → choose **Node.js**.
-2. Copy the connection string. It looks like:
+2. Copy the connection string. It looks like this, with your own cluster address in place of `<cluster-address>`:
    ```
-   mongodb+srv://fairshare-app:<db_password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+   mongodb+srv://fairshare-app:<db_password>@<cluster-address>.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
    ```
 3. Make two changes (in a plain text editor, not in any file inside the project):
    - Replace `<db_password>` (including the `<` and `>`) with the password from step 2.
-   - Add the database name **`fairshare`** right after `.mongodb.net/` and before the `?`:
-     ```
-     mongodb+srv://fairshare-app:YOUR_PASSWORD@cluster0.abcde.mongodb.net/fairshare?retryWrites=true&w=majority&appName=Cluster0
-     ```
-     Without it, MongoDB stores everything in a database called `test`.
+   - Add the database name **`fairshare`** right after `.mongodb.net/` and before the `?`, so that part reads
+     `.mongodb.net/fairshare?retryWrites=...`. Without it, MongoDB stores everything in a database called `test`.
+
+   The examples in this guide keep the `<...>` placeholders on purpose: a realistic-looking example
+   (`user:SOMEPASSWORD@...`) makes GitHub's secret scanning report a leaked secret, even though it's fake.
 
 Never commit this string or paste it into chat, an issue or a screenshot. It only goes into Render (Part 2).
 
@@ -107,7 +107,7 @@ password in the README) and anyone can change their data, so treat them as a san
 **in PowerShell on your own computer**, from the `fairshare` folder, with your real connection string:
 
 ```powershell
-$env:MONGODB_URI = "mongodb+srv://fairshare-app:YOUR_PASSWORD@cluster0.abcde.mongodb.net/fairshare?retryWrites=true&w=majority"
+$env:MONGODB_URI = "<paste your full connection string from step 4 here>"
 npm run seed
 Remove-Item Env:MONGODB_URI
 ```
