@@ -6,7 +6,9 @@ import helmet from 'helmet';
 import mongoose from 'mongoose';
 import { config } from './config.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { requireAuth } from './middleware/requireAuth.js';
 import { createAuthRouter } from './routes/auth.js';
+import { groupsRouter } from './routes/groups.js';
 
 const clientDist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../client/dist');
 
@@ -24,6 +26,7 @@ export function createApp({ authAttemptsPerWindow = 20 } = {}) {
   });
 
   app.use('/api/auth', createAuthRouter({ attemptsPerWindow: authAttemptsPerWindow }));
+  app.use('/api/groups', requireAuth, groupsRouter);
 
   // Unknown API paths get a JSON 404 instead of falling through to the React app.
   app.use('/api', (req, res) => {

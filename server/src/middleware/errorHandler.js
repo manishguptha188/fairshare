@@ -12,7 +12,7 @@ export function errorHandler(err, req, res, next) {
   }
 
   if (err instanceof HttpError) {
-    return res.status(err.status).json({ error: err.message });
+    return res.status(err.status).json({ error: err.message, ...(err.fields && { fields: err.fields }) });
   }
 
   // express.json() sets this when the request body is not valid JSON.

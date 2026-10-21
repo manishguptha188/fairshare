@@ -4,13 +4,12 @@ import { rateLimit } from 'express-rate-limit';
 import { z } from 'zod';
 import { HttpError } from '../errors.js';
 import { AUTH_COOKIE, authCookieOptions, createAuthToken } from '../lib/authToken.js';
+import { email } from '../lib/validation.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { User } from '../models/User.js';
 
 // Cost 10 takes roughly 100 ms per hash: slow enough to make guessing expensive, fast enough for a login.
 const BCRYPT_COST = 10;
-
-const email = z.string().trim().toLowerCase().pipe(z.email('Enter a valid email address.'));
 
 const registerSchema = z.object({
   name: z.string().trim().min(1, 'Enter your name.').max(50, 'Use at most 50 characters.'),

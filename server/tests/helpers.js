@@ -14,3 +14,13 @@ export async function signUp(app, { name = 'Asha', email = 'asha@example.com', p
   }
   return { agent, user: res.body.user };
 }
+
+// Creates a group owned by `owner` and adds the other signed-up users to it through the API.
+export async function createGroup(owner, others = [], name = 'Flat 4B') {
+  const created = await owner.agent.post('/api/groups').send({ name });
+  const groupId = created.body.group.id;
+  for (const other of others) {
+    await owner.agent.post(`/api/groups/${groupId}/members`).send({ email: other.user.email });
+  }
+  return groupId;
+}
